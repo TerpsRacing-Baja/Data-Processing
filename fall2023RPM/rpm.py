@@ -2,6 +2,7 @@ import os
 import csv
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Time interval between sampling in milliseconds 
 
@@ -75,23 +76,31 @@ class rpmData:
         line segment a RPM value, a mid-point value, and a weight value for 
         interpolation. Smaller segments have less weight and vice versa. 
     '''
-    def getWeightedPointsFromStepFunction(x: list(float), y: list(float)) -> tuple:
-        totalPoints = len(x)
-        pointsCounter = 0.0
-        currentXValue = x[0]
+    def getLineSegmentsFromStepFunction(self, t: list, y: list) -> tuple:
+        pointer = 0
+        index = 0
+        currentTValue = t[0]
         currentYValue = y[0]
-        xValues = []
-        yValues = [currentYValue]
-        weights = []
-        for dx, dy in zip(x, y):
+        intervalValues = []
+        yValues = []
+        for dt, dy in zip(t, y):
             if (dy != currentYValue):
-                #####
-                currentYValue = dy
+                intervalValues.append([currentTValue, dt]) 
                 yValues.append(currentYValue)
-                weights.append(pointsCounter / totalPoints)
-                pointsCounter = 0.0
-            else:
-                pointsCounter += 1
+                currentTValue = dt
+                currentYValue = dy
+                pointer = index
+            index += 1
+        # accounts for the last static line segment
+        if (pointer != len(t)):
+            intervalValues.append((currentTValue, t[-1]))
+            yValues.append(y[-1])
+        return intervalValues, yValues
+    
+    def getIntervalMidpoints(self, intervals: list) -> list:
+        return [(intervals[i][1] + intervals[i][0]) / 2 for i in range(len(intervals))]
+      
+                
 
 # x, y = rpmData().getAverageRPMList(10)
 # plt.plot(x, y)
@@ -103,6 +112,20 @@ class rpmData:
 The following currently returns a list whose first value is 
 (500 samples / 2) * 20 ms => 5 seconds forwards from the dataset
 '''
-x, y = rpmData().getAverageRPMList(500)
-plt.plot(x, y)
+r = rpmData()
+for i in [50, 100, 500, 1000]:
+    t, y = r.getAverageRPMList(i)
+    intervals, avgrpm = r.getLineSegmentsFromStepFunction(t, y)
+    midpoints = r.getIntervalMidpoints(intervals)
+    fig = plt.figure()
+    plt.scatter(midpoints, avgrpm, color = "red", label = "Midpoints")
+    plt.plot(t, y, label = f"Moving average RPM")
+    plt.plot(t[:i], np.full(i, min(avgrpm)), label = "Window")
+    plt.title(f"Window Size: {i * 0.02} seconds")
+    plt.legend()
 plt.show()
+
+# Add weights on line segments and then interpolate??
+# Predictive modeling wanted?? (I have little experience in that)
+# Please teach me time series, jane street is lowkey a goal jk not really 
+# Drug design with ai though <3
