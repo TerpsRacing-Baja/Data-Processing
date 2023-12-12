@@ -94,7 +94,7 @@ datalabels = pd.read_csv('C:/Users/farme/OneDrive/Documents/TerpsRacingRaceCaptu
 dfdata = pd.read_csv('C:/Users/farme/OneDrive/Documents/TerpsRacingRaceCaptureData/rc_1.csv', header = 0)
 
 for col in datalabels:
-    '''
+    #NOTE: interval loop takes in EVERY interval data point, not the interval between each data collection
     if 'Interval'in col:
         TIMELIST = datalabels['Interval|"ms"|0|0|1'].tolist()
         for i in TIMELIST:
@@ -102,16 +102,9 @@ for col in datalabels:
             if change == 'nan' or change == 'Interval|"ms"|0|0|1':
                 pass
             else:
-                timeint.append(float(change))'''
+                timeint.append(float(change))
     if 'Pitch'in col:
         PITCHLIST = datalabels['Pitch|"Deg/Sec"|-120|120|50'].tolist()
-        TIMELIST = datalabels['Interval|"ms"|0|0|1'].tolist()
-        for i in TIMELIST:
-            change = str(i)
-            if change == 'nan' or change == 'Interval|"ms"|0|0|1':
-                pass
-            else:
-                timeint.append(float(change))
         for i in PITCHLIST:
             change = str(i)
             if change == 'nan' or change == 'Pitch|"Deg/Sec"|-120|120|50':
@@ -320,6 +313,10 @@ for i in range(N):
     fig.canvas.flush_events()
     fig.show()
     time.sleep(0.013)
+    fig.delaxes(ax)
+plt.show()
+
+
     fig.delaxes(ax)
 plt.show()
 
