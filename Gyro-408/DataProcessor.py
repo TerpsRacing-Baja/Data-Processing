@@ -315,8 +315,6 @@ for i in range(N):
     time.sleep(0.013)
     fig.delaxes(ax)
 plt.show()
-
-
-    fig.delaxes(ax)
+fig.delaxes(ax)
 plt.show()
 
