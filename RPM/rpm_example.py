@@ -10,8 +10,11 @@ def filter(voltage, low, high):
 
 # import CSV, grab relevant cols, and clean unknown rows
 # column names differ depending on port configuration and sampling rate
-df = pd.read_csv("WITH-sway-bar-accel-right-wheels-2.csv")
-df = df[["Interval|\"ms\"|0|0|1","Analog5|\"Volts\"|0.0|5.0|200"]]
+df = pd.read_csv("WITH-sway-bar-accel-right-wheels-2.csv") \
+       .rename(columns={"Interval|\"ms\"|0|0|1" : "Interval (ms)",
+                        "Analog5|\"Volts\"|0.0|5.0|200": "Voltage"})
+
+df = df[["Interval (ms)", "Voltage"]]
 df.dropna(
     axis=0,
     how='any',
@@ -20,12 +23,12 @@ df.dropna(
 )
 
 # pull out relevant dataframes
-voltages = df["Analog5|\"Volts\"|0.0|5.0|200"]
-intervals = df["Interval|\"ms\"|0|0|1"]
+voltages = df["Voltage"]
+intervals = df["Interval (ms)"]
 
 # initialize state for tracking pulses
 periods = pd.DataFrame({"Period (ms)": []})
-times = pd.DataFrame({"Time (ms)": []})
+times = pd.DataFrame({"Interval (ms)": []})
 past_state = 0
 past_time = -1
 
@@ -52,7 +55,8 @@ for i in range(0, len(voltages) - 1):
 # apply 10-index rolling average (check what timeframe is reasonable for your data)
 # join with time dataframe and plot
 periods.transform(lambda el: 60 / (el / 1000) / 12) \
+       .rename(columns={"Period (ms)": "RPM"}) \
        .rolling(window = 10).mean() \
        .join(times) \
-       .plot(x='Time (ms)', y='Period (ms)') \
-       .get_figure().savefig("periods.pdf")
+       .plot(x='Interval (ms)', y='RPM') \
+       .get_figure().savefig("RPM_graph.pdf")
