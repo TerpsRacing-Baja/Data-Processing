@@ -69,7 +69,7 @@ class rpmData:
             raise Exception("windowSize cannot be greater than number of rows")
         # Returns a list of ordered pairs: (window-median time, average RPM)
         # To separate average RPM from time?
-        return ([self.dataframe.iloc[int(index + windowSize / 2), 0]    for index in range(0, totalRows - windowSize)],
+        return ([self.dataframe.iloc[int(index + windowSize / 2), 0] for index in range(0, totalRows - windowSize)],
                 [self.getAverageRPM(index, index + windowSize) for index in range(0, totalRows - windowSize)])
     '''
         The idea is that from the average RPM step function, we can assign each 
