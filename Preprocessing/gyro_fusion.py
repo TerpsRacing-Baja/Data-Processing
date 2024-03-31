@@ -7,6 +7,9 @@ import os
 import argparse
 
 # define command line arguments
+# expected format: python gyro_fusion.py WITH-sway-bar-accel-both-wheels-1.csv 14 11 -s
+# first number represents the column position of gyroscopic data starting at 0
+# the second represets the column position of acceleration data starting at 0
 parser = argparse.ArgumentParser(description="Carve up RaceCapture CSV files")
 parser.add_argument('filename')
 parser.add_argument('gyro_data', type=int, default=-1)  # reminder the columns start at 0
@@ -20,9 +23,6 @@ if(args.gyro_data == -1 or args.accel_data == -1):
 
 
 # ERIC XU CODE STARTS -------------------------------------------
-# expected format: python gyro_fusion.py WITH-sway-bar-accel-both-wheels-1.csv 14 11 -s
-# first number represents the column position of gyroscopic data starting at 0
-# the second represets the column position of acceleration data starting at 0
 data = np.genfromtxt(args.filename, delimiter=",", skip_header=1)
 
 idx = data[:, 0]
