@@ -9,26 +9,36 @@ import argparse
 # define command line arguments
 parser = argparse.ArgumentParser(description="Carve up RaceCapture CSV files")
 parser.add_argument('filename')
-parser.add_argument('-s', '--show', type=bool, default=False)
+parser.add_argument('gyro_data', type=int, default=-1)  # reminder the columns start at 0
+parser.add_argument('accel_data', type=int, default=-1)
+parser.add_argument('-s', '--show', action='store_true')  # Use action='store_true' for boolean flags
 args = parser.parse_args()
 
+if(args.gyro_data == -1 or args.accel_data == -1):
+    print("Uh oh spagetti-o, you are missing arguments for gyro and/or accel data columns")
+    exit
+
+
 # ERIC XU CODE STARTS -------------------------------------------
-# Import sensor data
+# expected format: python gyro_fusion.py WITH-sway-bar-accel-both-wheels-1.csv 14 11 -s
+# first number represents the column position of gyroscopic data starting at 0
+# the second represets the column position of acceleration data starting at 0
 data = np.genfromtxt(args.filename, delimiter=",", skip_header=1)
 
 idx = data[:, 0]
-t = idx - idx.min() # normalize indices to zero
-t = t / 1000.0 # convert to float seconds (gross)
-g = data[:, 14:17]
-a = data[:, 11:14]
+timestamp_raw = idx - idx.min() # normalize indices to zero
+timestamp_raw = timestamp_raw / 1000.0 # convert to float seconds (gross)
+gyro_data_raw = data[:, args.gyro_data:args.gyro_data+3]
+acceleration_data_raw = data[:, args.accel_data:args.accel_data+3]
+# acceleration_data_raw[:, 2] -= 1
 
 # Create and apply boolean masks to filter out NaN values
-g_mask = ~np.isnan(g).any(axis=1)
-a_mask = ~np.isnan(a).any(axis=1)
+g_mask = ~np.isnan(gyro_data_raw).any(axis=1)
+a_mask = ~np.isnan(acceleration_data_raw).any(axis=1)
 idx = idx[g_mask]
-timestamp = t[g_mask]
-gyroscope = g[g_mask]
-accelerometer = a[a_mask]
+timestamp = timestamp_raw[g_mask]
+gyroscope = gyro_data_raw[g_mask]
+accelerometer = acceleration_data_raw[a_mask]
 
 # Plot sensor data
 _, axes = pyplot.subplots(nrows=3, sharex=True)
