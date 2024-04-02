@@ -6,21 +6,15 @@ import matplotlib.pyplot as plt
 parser  = argparse.ArgumentParser(description="Carve up and accept two csv files")
 parser.add_argument("filename1")
 parser.add_argument("filename2")
-parser.add_argument("start_interval", type = int)
-parser.add_argument("end_interval", type = int)
 args = parser.parse_args()
 
 # grabbing relevant cols from both files and cleaning unknown rows
 df1 = pd.read_csv(args.filename1)
-df1 = df1[df1["Interval|\"ms\"|0|0|1"] >= args.start_interval]
-df1= df1[df1["Interval|\"ms\"|0|0|1"] <= args.end_interval]\
-    .rename(columns={"Interval|\"ms\"|0|0|1" : "Interval (ms)",
+df1= df1.rename(columns={"Interval|\"ms\"|0|0|1" : "Interval (ms)",
                         "Speed|\"mph\"|0.0|150.0|25": "Speed",})
 
 df2 = pd.read_csv(args.filename2)
-df2 = df2[df2["Interval|\"ms\"|0|0|1"] >= args.start_interval]
-df2 = df2[df2["Interval|\"ms\"|0|0|1"] <= args.end_interval]\
-    .rename(columns={"Interval|\"ms\"|0|0|1" : "Interval (ms)",
+df2 = df2.rename(columns={"Interval|\"ms\"|0|0|1" : "Interval (ms)",
                         "Speed|\"mph\"|0.0|150.0|25": "Speed",})
 
 df1 = df1[["Speed"]]
