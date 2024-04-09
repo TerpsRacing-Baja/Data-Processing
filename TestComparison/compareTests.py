@@ -11,13 +11,15 @@ args = parser.parse_args()
 # grabbing relevant cols from both files and cleaning unknown rows
 df1 = pd.read_csv(args.filename1)
 df1= df1.rename(columns={"Interval|\"ms\"|0|0|1" : "Interval (ms)",
-                        "Speed|\"mph\"|0.0|150.0|25": "Speed",})
+                        "Speed|\"mph\"|0.0|150.0|25": "Speed",
+                         "Analog7|\"Volts\"|0.0|5.0|200": "CVT Temp",})
 
 df2 = pd.read_csv(args.filename2)
 df2 = df2.rename(columns={"Interval|\"ms\"|0|0|1" : "Interval (ms)",
-                        "Speed|\"mph\"|0.0|150.0|25": "Speed",})
+                        "Speed|\"mph\"|0.0|150.0|25": "Speed",
+                        "Analog7|\"Volts\"|0.0|5.0|200": "CVT Temp", })
 
-df1 = df1[["Speed"]]
+df1 = df1[["Speed", "CVT Temp"]]
 df1.dropna(
     axis=0,
     how='any',
@@ -25,7 +27,7 @@ df1.dropna(
     inplace=True
 )
 
-df2 = df2[["Speed"]]
+df2 = df2[["Speed", "CVT Temp"]]
 df2.dropna(
     axis=0,
     how='any',
@@ -36,21 +38,42 @@ df2.dropna(
 speed1 = df1["Speed"]
 speed2 = df2["Speed"]
 
+cvt1 = df1["CVT Temp"]
+cvt1.transform(lambda x: -(100/209)*(100*x-298))
+cvt2 = df2["CVT Temp"]
+cvt2.transform(lambda x: -(100/209)*(100*x-298))
+
+ 
+
+
+
+
 #plotting values on graph and displaying them
-fig,axs = plt.subplots(2,1)
-
-plt.sca(axs[0])
-plt.plot(speed1, color = 'g', linewidth = 2, label = "test1") 
-plt.xlabel("Time (ms)")
-plt.ylabel("Speed (mph)")
-plt.title("Test1")
+fig,axs = plt.subplots(2,2)
 
 
-plt.sca(axs[1])
-plt.plot(speed2, color = 'r', linewidth = 2, label = "test2") 
-plt.xlabel("Time (ms)")
-plt.ylabel("Speed (mph)")
-plt.title("Test2")
+axs[0,0].plot(cvt1, color = 'g', linewidth = 2, label = "test1") 
+axs[0,0].set_title('CVT Test 1')
+axs[0,0].set_xlabel('time (ms)')
+
+axs[0,1].plot(cvt2, color = 'r', linewidth = 2, label = "test1") 
+axs[0,1].set_title('CVT Test 2')
+axs[0,1].set_xlabel('time (ms)')
+
+axs[1,0].plot(speed1, color = 'b', linewidth = 2, label = "test1") 
+axs[1,0].set_title('Speed Test 1')
+axs[1,0].set_xlabel('time (ms)')
+axs[1,0].set_ylabel('speed(mph)')
+
+axs[1,1].plot(speed2, color = 'y', linewidth = 2, label = "test1") 
+axs[1,1].set_title('Speed Test 2')
+axs[1,1].set_xlabel('time (ms)')
+axs[1,1].set_ylabel('speed(mph)')
+
+
+
+
+
 
 
 plt.show()
