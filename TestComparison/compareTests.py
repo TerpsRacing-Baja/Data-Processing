@@ -38,6 +38,7 @@ df2.dropna(
 speed1 = df1["Speed"]
 speed2 = df2["Speed"]
 
+# extracting CVT data from dataframes and applying Daniel's transform
 cvt1 = df1["CVT Temp"]
 cvt1.transform(lambda x: -(100/209)*(100*x-298))
 cvt2 = df2["CVT Temp"]
@@ -48,7 +49,7 @@ cvt2.transform(lambda x: -(100/209)*(100*x-298))
 
 
 
-#plotting values on graph and displaying them
+# plotting values on graph and displaying them
 fig,axs = plt.subplots(2,2)
 
 
