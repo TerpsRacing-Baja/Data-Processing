@@ -2,8 +2,14 @@ import pandas as pd
 import argparse
 import os
 
+def removeQuotes(col):
+    return col.replace('\"', '')
+
+# python3 rename_cols filename -q
+
 parser = argparse.ArgumentParser(description="Rename data columns according to argument inputs")
 parser.add_argument('filename')
+parser.add_argument('-q', '--quotes', type=bool)
 parser.add_argument('-1', '--an1', type=str)
 parser.add_argument('-2', '--an2', type=str)
 parser.add_argument('-3', '--an3', type=str)
@@ -26,6 +32,12 @@ df = pd.read_csv(args.filename) \
                         "Analog7|\"Volts\"|0.0|5.0|" + args.sampling : args.an7 or "Analog7|\"Volts\"|0.0|5.0|" + args.sampling,
                         "Analog8|\"Volts\"|0.0|5.0|" + args.sampling : args.an8 or "Analog8|\"Volts\"|0.0|5.0|" + args.sampling
                         })
+
+if(args.quotes):
+    df_list = df.columns.to_list()
+    for col in df_list:
+       df.rename(columns = {col : removeQuotes(col)})
+
 
 write_name = 'RENAMED_COLS_' + os.path.basename(args.filename)
 df.to_csv(write_name)
