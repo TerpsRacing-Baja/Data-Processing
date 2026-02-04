@@ -83,12 +83,12 @@ if (args.show):
 # ERIC XU CODE ENDS ---------------------------------------------
 
 # merge euler angles into original CSV and save
-new_data = pd.DataFrame({"Interval|\"ms\"|0|0|1": list([int(x) for x in idx]),
+new_data = pd.DataFrame({"Interval|ms|0|0|1": list([int(x) for x in idx]),
                          'Euler Roll': list(euler[:, 0]),
                          'Euler Pitch': list(euler[:, 1]),
                          'Euler Yaw': list(euler[:, 2])},
-                         columns = ["Interval|\"ms\"|0|0|1", 'Euler Roll', 'Euler Pitch', 'Euler Yaw'])
+                         columns = ["Interval|ms|0|0|1", 'Euler Roll', 'Euler Pitch', 'Euler Yaw'])
 df = pd.read_csv(args.filename)
-df = df.merge(new_data, how = 'left', on = "Interval|\"ms\"|0|0|1")
+df = df.merge(new_data, how = 'left', on = "Interval|ms|0|0|1")
 write_name = str(os.path.basename(args.filename) + '_' + 'withEULER.csv')
 df.to_csv(write_name)
